@@ -1,0 +1,59 @@
+﻿@using System.Net.Http.Json
+@using myapp.Models
+@inject HttpClient Http
+@code {
+    private List<Conta> contas;
+    private Conta novaConta = new Conta();
+
+    protected override async Task OnInitializedAsync()
+    {
+        contas = await Http.GetFromJsonAsync<List<Conta>>("api/Conta");
+    }
+
+    private async Task CriarConta()
+    {
+        await Http.PostAsJsonAsync("api/Conta", novaConta);
+        novaConta = new Conta(); // Clear the form
+        contas = await Http.GetFromJsonAsync<List<Conta>>("api/Conta"); // Refresh the list
+    }
+}
+
+
+@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<h2>Existing Accounts</h2>
+@if (contas == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ul>
+        @foreach (var conta in contas)
+        {
+            <li>@conta.NomeCliente (ID: @conta.Id, Saldo: @conta.Saldo.ToString("C2"))</li>
+        }
+    </ul>
+}
+
+<h2>Create New Account</h2>
+<EditForm Model="@novaConta" OnValidSubmit="@CriarConta">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="nomeCliente">Nome do Cliente:</label>
+        <InputText id="nomeCliente" @bind-Value="novaConta.NomeCliente" />
+    </div>
+    <div>
+        <label for="saldo">Saldo Inicial:</label>
+        <InputNumber id="saldo" @bind-Value="novaConta.Saldo" />
+    </div>
+    <button type="submit">Criar Conta</button>
+</EditForm>
