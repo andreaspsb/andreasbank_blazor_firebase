@@ -17,9 +17,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IContaRepository, ContaRepository>();
 builder.Services.AddScoped<ContaService>();
 
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7265/") });
+
 builder.Services.AddControllers();
 
-builder.Services.AddHttpClient();
+//builder.Services.AddHttpClient();
+
+builder.Services.AddHttpClient("MyApi", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7265/"); // Replace with your actual backend URL and port
+});
 
 var app = builder.Build();
 
